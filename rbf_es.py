@@ -11,12 +11,19 @@ import random
 class ES:
     def __init__(self):
         self._population = []
-        self._population_size = 10000;
+        self._population_size = 10000
+        self._chromosome_max_size = 10  # in this version length of chromosomes aren't constant
+        self._gene_fields_number = 3  # x,y,r
         self._children = []
         self._best_chromosome = []
 
-    def initialize_population(self):
-        print("initialize population")
+    def initialize_population(self, max_range, min_range):
+        # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
+        for i in range(self._population_size):
+            chromosome = [random.random() * 300]  # add σ to chromosome
+            for j in range(self._gene_fields_number * random.randint(self._chromosome_max_size)):
+                chromosome.append(random.random() * (max_range - min_range) + min_range)
+            self._population.append(chromosome)
 
     def mutation(self):
         print("mutation")
