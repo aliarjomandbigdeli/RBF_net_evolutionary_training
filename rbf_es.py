@@ -38,7 +38,24 @@ class ES:
                 chromosome[i] = chromosome[i] + sigma * random.normalvariate(mu=0, sigma=1)
 
     def crossover(self):
-        print("parent selection")
+        parent1 = self._population[random.randint(self._population_size)]
+        parent2 = self._population[random.randint(self._population_size)]
+        shorter_parent = parent1
+        longer_parent = parent2
+        if len(longer_parent) < len(shorter_parent):
+            shorter_parent = parent2
+            longer_parent = parent1
+
+        self._children = []
+        for i in range(7 * self._population_size):
+            child = []
+
+            for j in range(len(shorter_parent)):
+                child.append((shorter_parent[j] + longer_parent[j]) / 2)
+            for j in range(len(shorter_parent), len(longer_parent)):
+                child.append(longer_parent[j])
+
+            self._children.append(child)
 
     def fitness(self, func, chromosome):
         return func(chromosome)
