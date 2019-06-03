@@ -10,7 +10,7 @@ import math
 
 
 class ES:
-    def __init__(self):
+    def __init__(self, fitness_func):
         self._population = []
         self._population_size = 10000
         self._chromosome_max_size = 10  # in this version length of chromosomes aren't constant
@@ -18,6 +18,7 @@ class ES:
         self._tau = 1 / self._population_size ** 0.5
         self._children = []
         self._best_chromosome = []
+        self._fitness_func = fitness_func
 
     def initialize_population(self, max_range, min_range):
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
@@ -57,12 +58,44 @@ class ES:
 
             self._children.append(child)
 
-    def fitness(self, func, chromosome):
-        return func(chromosome)
+    def fitness(self, chromosome):
+        return self._fitness_func(chromosome)
+
+    def make_wheel(self, population):
+        wheel = []
+        total = sum(self.fitness(p) for p in population)
+        top = 0
+        for p in population:
+            f = self.fitness(p) / total
+            wheel.append((top, top + f, p))
+            top += f
+        return wheel
+
+    def bin_search(self, wheel, num):
+        mid = len(wheel) // 2
+        low, high, answer = wheel[mid]
+        if low <= num <= high:
+            return answer
+        elif low > num:
+            return self.bin_search(wheel[mid + 1:], num)
+        else:
+            return self.bin_search(wheel[:mid], num)
+
+    def select(self, wheel, n_select):
+        step_size = 1.0 / n_select
+        new_generation = []
+        r = random.random()
+        new_generation.append(self.bin_search(wheel, r))
+        while len(new_generation) < n_select:
+            r += step_size
+            if r > 1:
+                r %= 1
+            new_generation.append(self.bin_search(wheel, r))
+        return new_generation
 
     def survivors_selection(self):
-        for j in range(self._population_size):
-            self._population[j] = 0
+        wheel = self.make_wheel(self._children)
+        self._population = self.select(wheel, self._population_size)
 
     def exec(self, max_iter):
         self.initialize_population()
