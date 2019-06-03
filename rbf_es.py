@@ -261,14 +261,8 @@ class RBFRegression:
                 g[i, j] = math.exp(-1 * (la.norm(self._data[i] - centers[j], 2) / radius_vectors[j]) ** 2)
 
         self._g = g
-        # print("g size:")
-        # print(g.shape)
-        # print("len centers:")
-        # print(len(centers))
         lam = 0.01
         self._w = la.inv(g.transpose().dot(g) + lam * np.identity(len(centers))).dot(g.transpose()).dot(self._y_star)
-        # print("W size:")
-        # print(self._w.shape)
         self._y = g.dot(self._w)
 
 
@@ -285,10 +279,10 @@ class RBFClassifier:
         self._max_range = 10
 
         self._population = []
-        self._population_size = 10000
+        self._population_size = 1000
         self._chromosome_max_size = 10  # in this version length of chromosomes aren't constant
         self._gene_fields_number = 3  # x,y,r
-        self._tau = 1 / self._population_size ** 0.5
+        self._tau = 1 / self._gene_fields_number ** 0.5
         self._children = []
         self._best_chromosome = []
 
@@ -301,6 +295,9 @@ class RBFClassifier:
     def y(self):
         """:returns predicted vector"""
         return self._y
+
+    def y_star(self):
+        return self._y_star
 
     def create_random_dataset(self, num_of_data, dimension, cluster_number):
         """create random dataset by normal distribution"""
@@ -315,8 +312,8 @@ class RBFClassifier:
     def initialize_population(self, max_range, min_range):
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
-            chromosome = [random.random() * 300]  # add σ to chromosome
-            for j in range(self._gene_fields_number * random.randint(self._chromosome_max_size)):
+            chromosome = [(max_range - min_range) * 0.2]  # add σ to chromosome
+            for j in range(self._gene_fields_number * random.randint(2, self._chromosome_max_size)):
                 chromosome.append(random.random() * (max_range - min_range) + min_range)
             self._population.append(chromosome)
 
@@ -331,8 +328,8 @@ class RBFClassifier:
                 chromosome[i] = chromosome[i] + sigma * random.normalvariate(mu=0, sigma=1)
 
     def crossover(self):
-        parent1 = self._population[random.randint(self._population_size)]
-        parent2 = self._population[random.randint(self._population_size)]
+        parent1 = self._population[random.randint(0, self._population_size)]
+        parent2 = self._population[random.randint(0, self._population_size)]
         shorter_parent = parent1
         longer_parent = parent2
         if len(longer_parent) < len(shorter_parent):
@@ -387,30 +384,27 @@ class RBFClassifier:
         wheel = self.make_wheel(self._children)
         self._population = self.select(wheel, self._population_size)
 
-    def exec(self, max_iter, data):
+    def train(self, max_iter, data):
         self._data = data
-        print("train")
+
         self.initialize_population(self._max_range, self._min_range)
         for i in range(max_iter):
             self.mutation()
             self.crossover()
-            self.survivous_selection()
-
-    def train(self, max_iter, data):
-        self._data = data
-        print("train")
+            self.survivors_selection()
+            print(f'iter {i}')
 
     def fitness(self, chromosome):
         return 0
 
     def calculate_matrices(self, chromosome):
-        g = np.zeros((len(self._data), len(chromosome // self._gene_fields_number)))
+        g = np.zeros((len(self._data), len(chromosome) // self._gene_fields_number))
 
         centers = []
         radius_vectors = []
         for i in range(len(chromosome)):
             if i % self._gene_fields_number == 1:
-                center = [chromosome[i], chromosome[i + 1]]
+                center = chromosome[i: i + self._dimension]
                 # radius_vect = [chromosome[i + 2], chromosome[i + 2]]
                 radius_vectors.append(chromosome[i + self._gene_fields_number - 1])
                 centers.append(center)
@@ -420,6 +414,6 @@ class RBFClassifier:
                 g[i, j] = math.exp(-1 * (la.norm(self._data[i] - centers[j], 2) / radius_vectors[j]) ** 2)
 
         self._g = g
-        landa = 0.01
-        self._w = la.inv(g.transpose().dot(g) + landa * np.identity(len(centers)))
+        lam = 0.01
+        self._w = la.inv(g.transpose().dot(g) + lam * np.identity(len(centers))).dot(g.transpose()).dot(self._y_star)
         self._y = g.dot(self._w)
