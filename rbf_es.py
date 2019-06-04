@@ -121,7 +121,7 @@ class RBFRegression:
 
         self._population = []
         self._population_size = 1000
-        self._chromosome_max_size = 10  # in this version length of chromosomes aren't constant
+        self._chromosome_max_bases = 10  # in this version length of chromosomes aren't constant
         self._gene_fields_number = 3  # x,y,r
         self._tau = 1 / self._gene_fields_number ** 0.5
         self._children = []
@@ -158,7 +158,7 @@ class RBFRegression:
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
             chromosome = [(max_range - min_range) * 0.2]  # add σ to chromosome
-            for j in range(self._gene_fields_number * random.randint(2, self._chromosome_max_size)):
+            for j in range(self._gene_fields_number * random.randint(2, self._chromosome_max_bases)):
                 chromosome.append(random.random() * (max_range - min_range) + min_range)
             self._population.append(chromosome)
 
