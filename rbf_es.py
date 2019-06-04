@@ -121,9 +121,9 @@ class RBFRegression:
 
         self._population = []
         self._population_size = 1000
-        self._chromosome_max_bases = 10  # in this version length of chromosomes aren't constant
-        self._gene_fields_number = 3  # x,y,r
-        self._tau = 1 / self._gene_fields_number ** 0.5
+        self._chromosome_max_bases = 4  # in this version length of chromosomes aren't constant
+        self._base_fields_number = 2  # x,r (dimension + 1(for radius))
+        self._tau = 1 / self._base_fields_number ** 0.5
         self._children = []
         self._best_chromosome = []
 
@@ -148,6 +148,7 @@ class RBFRegression:
 
         # x, y = make_regression(n_samples=num_of_data, n_features=dimension, noise=0.1)
         self._dimension = dimension
+        self._base_fields_number = dimension + 1
         self._data = x
         self._y_star = y
 
@@ -158,7 +159,7 @@ class RBFRegression:
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
             chromosome = [(max_range - min_range) * 0.2]  # add σ to chromosome
-            for j in range(self._gene_fields_number * random.randint(2, self._chromosome_max_bases)):
+            for j in range(self._base_fields_number * random.randint(2, self._chromosome_max_bases)):
                 chromosome.append(random.random() * (max_range - min_range) + min_range)
             self._population.append(chromosome)
 
@@ -268,15 +269,15 @@ class RBFRegression:
         return 1 / error
 
     def calculate_matrices(self, chromosome):
-        g = np.zeros((len(self._data), len(chromosome) // self._gene_fields_number))
+        g = np.zeros((len(self._data), len(chromosome) // self._base_fields_number))
 
         centers = []
         radius_vectors = []
         for i in range(len(chromosome)):
-            if i % self._gene_fields_number == 1:
+            if i % self._base_fields_number == 1:
                 center = chromosome[i: i + self._dimension]
                 # radius_vect = [chromosome[i + 2], chromosome[i + 2]]
-                radius_vectors.append(chromosome[i + self._gene_fields_number - 1])
+                radius_vectors.append(chromosome[i + self._base_fields_number - 1])
                 centers.append(center)
 
         for i in range(len(self._data)):
