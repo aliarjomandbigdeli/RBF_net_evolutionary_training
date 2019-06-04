@@ -192,42 +192,65 @@ class RBFRegression:
 
             self._children.append(child)
 
-    def make_wheel(self, population):
-        wheel = []
-        total = sum(self.fitness(p) for p in population)
-        top = 0
-        for p in population:
-            f = self.fitness(p) / total
-            wheel.append((top, top + f, p))
-            top += f
-        return wheel
+    # def make_wheel(self, population):
+    #     wheel = []
+    #     total = sum(self.fitness(p) for p in population)
+    #     top = 0
+    #     for p in population:
+    #         f = self.fitness(p) / total
+    #         wheel.append((top, top + f, p))
+    #         top += f
+    #     return wheel
+    #
+    # def bin_search(self, wheel, num):
+    #     mid = len(wheel) // 2
+    #     low, high, answer = wheel[mid]
+    #     if low <= num <= high:
+    #         return answer
+    #     elif low > num:
+    #         return self.bin_search(wheel[mid + 1:], num)
+    #     else:
+    #         return self.bin_search(wheel[:mid], num)
+    #
+    # def select(self, wheel, n_select):
+    #     """ this method selects chromosome based on SUS(Stochastic Universal Sampling)"""
+    #     step_size = 1.0 / n_select
+    #     new_generation = []
+    #     r = random.random()
+    #     new_generation.append(self.bin_search(wheel, r))
+    #     while len(new_generation) < n_select:
+    #         r += step_size
+    #         if r > 1:
+    #             r %= 1
+    #         new_generation.append(self.bin_search(wheel, r))
+    #     return new_generation
+    #
+    # def survivors_selection(self):
+    #     wheel = self.make_wheel(self._children)
+    #     self._population = self.select(wheel, self._population_size)
 
-    def bin_search(self, wheel, num):
-        mid = len(wheel) // 2
-        low, high, answer = wheel[mid]
-        if low <= num <= high:
-            return answer
-        elif low > num:
-            return self.bin_search(wheel[mid + 1:], num)
-        else:
-            return self.bin_search(wheel[:mid], num)
-
-    def select(self, wheel, n_select):
-        """ this method selects chromosome based on SUS(Stochastic Universal Sampling)"""
-        step_size = 1.0 / n_select
-        new_generation = []
-        r = random.random()
-        new_generation.append(self.bin_search(wheel, r))
-        while len(new_generation) < n_select:
-            r += step_size
-            if r > 1:
-                r %= 1
-            new_generation.append(self.bin_search(wheel, r))
-        return new_generation
+    def select_best(self, chromosome_list):
+        bst = chromosome_list[0];
+        for i in chromosome_list:
+            if self.fitness(bst) < self.fitness(i):
+                bst = i
+        return bst
 
     def survivors_selection(self):
-        wheel = self.make_wheel(self._children)
-        self._population = self.select(wheel, self._population_size)
+        """ this method works based on q-tournament """
+        q = 3
+        new_population = []
+        for i in range(self._population_size):
+            batch = []
+            for j in range(q):
+                r = random.randint(0, 8 * self._population_size - 1)
+                if r < self._population_size:
+                    batch.append(self._population[r])
+                elif r >= self._population_size:
+                    batch.append(self._children[r - self._population_size])
+            new_population.append(self.select_best(batch))
+
+        self._population = new_population
 
     def train(self, max_iter, data):
         self._data = data
