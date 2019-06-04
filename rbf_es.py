@@ -120,12 +120,12 @@ class RBFRegression:
         self._max_range = 10
 
         self._population = []
-        self._population_size = 1000
-        self._chromosome_max_bases = 5  # in this version length of chromosomes aren't constant
+        self._mutated_population = []
+        self._population_size = 100
+        self._chromosome_max_bases = 4  # in this version length of chromosomes aren't constant
         self._base_fields_number = 2  # x,r (dimension + 1(for radius))
-        self._tau = 1 / self._base_fields_number ** 0.5
+        self._tau = 0.5 / ((self._base_fields_number * self._chromosome_max_bases) ** 0.5)
         self._children = []
-        self._best_chromosome = []
 
     def data(self, d=None):
         """getter and setter of data"""
@@ -142,7 +142,7 @@ class RBFRegression:
 
     def create_random_dataset(self, num_of_data, dimension):
         x = np.random.uniform(0., 1., num_of_data)
-        # x = np.sort(x, axis=0)
+        x = np.sort(x, axis=0)
         noise = np.random.uniform(-0.1, 0.1, num_of_data)
         y = np.sin(2 * np.pi * x) + noise
 
@@ -158,7 +158,7 @@ class RBFRegression:
     def initialize_population(self, max_range, min_range):
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
-            chromosome = [(max_range - min_range) * 0.2]  # add σ to chromosome
+            chromosome = [(max_range - min_range) * 0.1]  # add σ to chromosome
             for j in range(self._base_fields_number * random.randint(2, self._chromosome_max_bases)):
                 chromosome.append(random.random() * (max_range - min_range) + min_range)
             self._population.append(chromosome)
@@ -168,14 +168,15 @@ class RBFRegression:
             # mutate σ at first
             sigma = chromosome[0]
             sigma = sigma * math.exp(self._tau * random.normalvariate(mu=0, sigma=1))
+            # print(f'past sigma: {chromosome[0]}, new sigma: {sigma}')
             chromosome[0] = sigma
             # mutate other genes
             for i in range(1, len(chromosome)):
                 chromosome[i] = chromosome[i] + sigma * random.normalvariate(mu=0, sigma=1)
 
     def crossover(self):
-        parent1 = self._population[random.randint(0, self._population_size)]
-        parent2 = self._population[random.randint(0, self._population_size)]
+        parent1 = self._population[random.randint(0, self._population_size - 1)]
+        parent2 = self._population[random.randint(0, self._population_size - 1)]
         shorter_parent = parent1
         longer_parent = parent2
         if len(longer_parent) < len(shorter_parent):
@@ -188,8 +189,10 @@ class RBFRegression:
 
             for j in range(len(shorter_parent)):
                 child.append((shorter_parent[j] + longer_parent[j]) / 2)
-            for j in range(len(shorter_parent), len(longer_parent)):
-                child.append(longer_parent[j])
+            # if self.fitness(longer_parent) > self.fitness(shorter_parent):
+            if i % 2 == 0:
+                for j in range(len(shorter_parent), len(longer_parent)):
+                    child.append(longer_parent[j])
 
             self._children.append(child)
 
@@ -233,14 +236,17 @@ class RBFRegression:
     def select_best(self, chromosome_list):
         bst = chromosome_list[0]
         for i in chromosome_list:
-            print(f'fitness: {self.fitness(i)}')
-            if self.fitness(bst) < self.fitness(i):
+            # fit = self.fitness(i)
+            fit = self.fitness(bst)
+            print(f'fitness: {fit}')
+            # if self.fitness(bst) < self.fitness(i):
+            if fit < self.fitness(i):
                 bst = i
         return bst
 
     def survivors_selection(self):
         """ this method works based on q-tournament """
-        q = 3
+        q = 4
         new_population = []
         for i in range(self._population_size):
             batch = []
@@ -264,6 +270,8 @@ class RBFRegression:
             self.survivors_selection()
             print(f'iter {i}')
 
+        self.fitness(self.select_best(self._population))
+
     def fitness(self, chromosome):
         self.calculate_matrices(chromosome)
         error = 0.5 * (la.norm(self._y - self._y_star, 2) ** 2)
@@ -277,7 +285,6 @@ class RBFRegression:
         for i in range(len(chromosome)):
             if i % self._base_fields_number == 1:
                 center = chromosome[i: i + self._dimension]
-                # radius_vect = [chromosome[i + 2], chromosome[i + 2]]
                 radius_vectors.append(chromosome[i + self._base_fields_number - 1])
                 centers.append(center)
 
