@@ -121,7 +121,7 @@ class RBFRegression:
 
         self._population = []
         self._population_size = 1000
-        self._chromosome_max_bases = 4  # in this version length of chromosomes aren't constant
+        self._chromosome_max_bases = 5  # in this version length of chromosomes aren't constant
         self._base_fields_number = 2  # x,r (dimension + 1(for radius))
         self._tau = 1 / self._base_fields_number ** 0.5
         self._children = []
@@ -231,8 +231,9 @@ class RBFRegression:
     #     self._population = self.select(wheel, self._population_size)
 
     def select_best(self, chromosome_list):
-        bst = chromosome_list[0];
+        bst = chromosome_list[0]
         for i in chromosome_list:
+            print(f'fitness: {self.fitness(i)}')
             if self.fitness(bst) < self.fitness(i):
                 bst = i
         return bst
