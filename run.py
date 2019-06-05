@@ -10,7 +10,7 @@ import rbf_es
 def main():
     for i in range(3):
         sample_num = 100
-        iter_num = 60
+        iter_num = 30
         my_rbf_reg = rbf_es.RBFRegression()
         my_rbf_reg.create_random_dataset(sample_num, 1)
         my_rbf_reg.train(iter_num, my_rbf_reg.data())
@@ -24,7 +24,6 @@ def main():
         # -- sorted samples(usually is in regression)
         plt.plot(my_rbf_reg.data(), my_rbf_reg.y(), '-o', label='RBF-Net')
         plt.plot(my_rbf_reg.data(), my_rbf_reg.y_star(), '-o', label='true')
-        plt.tight_layout()
         # -- sorted
         plt.legend()
         plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
