@@ -15,8 +15,9 @@ colors = {0: 'red', 1: 'blue', 2: 'green'}
 def main():
     print('RBF Network')
 
-    run_regression()
+    # run_regression()
     # run_bin_classification()
+    run_classification()
 
 
 def run_regression():
@@ -55,7 +56,7 @@ def run_regression():
     #     plt.savefig(f'{i}-2.png')
 
     # read excel
-    iter_num = 20
+    iter_num = 15
     my_rbf_reg = rbf_es.RBFRegression()
     my_rbf_reg.read_excel("regdata2000.xlsx")
     my_rbf_reg.initialize_parameters_based_on_data()
@@ -115,6 +116,52 @@ def run_bin_classification():
         plt.legend()
         plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
         plt.savefig(f'{i}-3.png')
+
+
+def run_classification():
+    sample_num = 300
+    iter_num = 20
+    my_rbf_classifier = rbf_es.RBFClassifier()
+    my_rbf_classifier.create_random_dataset(sample_num, 3, 2)
+    # my_rbf_classifier.read_excel("5clstest5000.xlsx")
+    my_rbf_classifier.initialize_parameters_based_on_data()
+    my_rbf_classifier.train(iter_num, my_rbf_classifier.data())
+
+    df = DataFrame(dict(x=my_rbf_classifier.data()[:, 0], y=my_rbf_classifier.data()[:, 1],
+                        label=my_rbf_classifier._y_star_before_1hot))
+    fig, ax = plt.subplots()
+    grouped = df.groupby('label')
+    for key, group in grouped:
+        group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
+    plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
+    plt.savefig(f'1.png')
+
+    # print(my_rbf_classifier.data()[:, 0])
+    # print(my_rbf_classifier.data()[:, 1])
+    print(my_rbf_classifier._y_star)
+    print(my_rbf_classifier._y_star_before_1hot)
+    # print(f'shape: {my_rbf_classifier._y_star.shape}')
+    # print(my_rbf_classifier.y())
+    # print(np.around(my_rbf_classifier.y()))
+
+    plt.figure()
+    df = DataFrame(dict(x=my_rbf_classifier.data()[:, 0], y=my_rbf_classifier.data()[:, 1],
+                        label=np.around(my_rbf_classifier.y())))
+    fig, ax = plt.subplots()
+    grouped = df.groupby('label')
+    for key, group in grouped:
+        group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
+    # plt.show()
+    plt.legend()
+    plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
+    plt.savefig(f'2.png')
+
+    plt.figure()
+    plt.plot(my_rbf_classifier._best_fitness_list, '-o', label='best')
+    plt.plot(my_rbf_classifier._avg_fitness_list, '-o', label='average')
+    plt.legend()
+    plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
+    plt.savefig(f'3.png')
 
 
 if __name__ == '__main__':
