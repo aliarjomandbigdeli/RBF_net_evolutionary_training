@@ -8,11 +8,12 @@ import rbf_es
 
 
 def main():
-    for i in range(3):
+    for i in range(4):
         sample_num = 100
-        iter_num = 30
+        iter_num = 60
         my_rbf_reg = rbf_es.RBFRegression()
         my_rbf_reg.create_random_dataset(sample_num, 1)
+        my_rbf_reg.initialize_parameters_based_on_data()
         my_rbf_reg.train(iter_num, my_rbf_reg.data())
 
         plt.figure()
