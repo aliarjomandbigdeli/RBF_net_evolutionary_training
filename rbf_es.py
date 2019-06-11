@@ -20,14 +20,14 @@ class RBFRegression:
         self._g = []
         self._w = []  # weight matrix
 
-        self._min_range = -10
-        self._max_range = 10
+        # self._min_range = -10
+        # self._max_range = 10
 
         self._population = []
         self._mutated_population = []
         self._population_size = 30
         self._child2population_ratio = 7
-        self._chromosome_max_bases = 7  # in this version length of chromosomes aren't constant
+        self._chromosome_max_bases = 10  # in this version length of chromosomes aren't constant
         self._chromosome_min_bases = 2
         self._base_fields_number = 2  # x,r (dimension + 1(for radius))
         self._tau = 0.5 / ((self._base_fields_number * self._chromosome_max_bases) ** 0.5)
@@ -36,7 +36,7 @@ class RBFRegression:
         self._best_fitness_list = [0]
         self._avg_fitness_list = [0]
         self._range_mat = []
-        # self._range_mat=np.zeros((len(self._data), len(chromo))
+        self._most_dist = 0.0
 
     def data(self, d=None):
         """getter and setter of data"""
@@ -62,44 +62,74 @@ class RBFRegression:
         self._data = x
         self._y_star = y
 
+    def read_excel(self, train_address):
+        dataset_train = pd.read_excel(train_address)
+        self._data = dataset_train.iloc[:, 0:dataset_train.shape[1] - 1].values
+        print(self._data)
+        # dataset_length = self._data.shape[0]
+        self._dimension = self._data.shape[1]
+        self._y_star = dataset_train.iloc[:, dataset_train.shape[1] - 1:dataset_train.shape[1]].values
+        self._y_star = self._y_star[:, 0]
+        print(f'y star len: {len(self._y_star)}')
+        print(f'y star shape: {self._y_star.shape}')
+        print(self._y_star)
+
     def initialize_parameters_based_on_data(self):
         self._base_fields_number = self._dimension + 1
 
         # self._tau = 0.5 / ((self._base_fields_number * self._chromosome_max_bases) ** 0.5)
         self._tau = 1 / (self._base_fields_number ** 0.5)
 
-        # self._range_mat = np.zeros((self._dimension, 2))
-        # print(x.shape)
-        # x.reshape(100, 1)
-        # print(x.shape)
-        # print(x[:, 0])
-        #
-        # for i in range(self._dimension):
-        #     self._range_mat[i, 0] = np.max(self._data[:,i])
-        #     self._range_mat[i, 1] = np.min(self._data[:,i])
-        #
-        # self._max_range = self._range_mat[0, 0]
-        # self._min_range = self._range_mat[0, 1]
+        self._range_mat = np.zeros((self._dimension, 2))
+        for i in range(self._dimension):
+            self._range_mat[i, 0] = np.max(self._data[:, i])
+            self._range_mat[i, 1] = np.min(self._data[:, i])
+        s = 0.0
+        for i in range(self._dimension):
+            s += (self._range_mat[i, 0] - self._range_mat[i, 1]) ** 2
+        self._most_dist = s ** (1 / self._dimension)
 
-        self._max_range = max(self._data)
-        self._min_range = min(self._data)
+        # print(f'range mat: {self._range_mat}')
+        # print(f'most distance: {self._most_dist}')
 
-    def initialize_population(self, max_range, min_range):
+    # def initialize_parameters_based_on_data(self):
+    #     self._base_fields_number = self._dimension + 1
+    #
+    #     # self._tau = 0.5 / ((self._base_fields_number * self._chromosome_max_bases) ** 0.5)
+    #     self._tau = 1 / (self._base_fields_number ** 0.5)
+    #
+    #     # self._range_mat = np.zeros((self._dimension, 2))
+    #     # print(x.shape)
+    #     # x.reshape(100, 1)
+    #     # print(x.shape)
+    #     # print(x[:, 0])
+    #     #
+    #     # for i in range(self._dimension):
+    #     #     self._range_mat[i, 0] = np.max(self._data[:,i])
+    #     #     self._range_mat[i, 1] = np.min(self._data[:,i])
+    #     #
+    #     # self._max_range = self._range_mat[0, 0]
+    #     # self._min_range = self._range_mat[0, 1]
+    #
+    #     self._max_range = max(self._data)
+    #     self._min_range = min(self._data)
+
+    def initialize_population(self):
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
-            chromosome = [(max_range - min_range) * 0.1]  # add σ to chromosome
+            # chromosome = [(max_range - min_range) * 0.1]  # add σ to chromosome
+            chromosome = [self._most_dist * 0.1]  # add σ to chromosome
             for j in range(
                     self._base_fields_number * random.randint(self._chromosome_min_bases, self._chromosome_max_bases)):
                 if (j + 1) % self._base_fields_number != 0:
-                    chromosome.append(random.random() * (max_range - min_range) + min_range)
+                    chromosome.append(random.random() * (
+                            self._range_mat[j % self._base_fields_number, 0] - self._range_mat[
+                        j % self._base_fields_number, 1]) + self._range_mat[j % self._base_fields_number, 1])
+                    # chromosome.append(random.random() * (max_range - min_range) + min_range)
                 else:  # radius can't be negative
-                    chromosome.append(random.random() * (max_range - min_range))
+                    chromosome.append(random.random() * self._most_dist)
             # print(f'chromosome {i}: {chromosome}, len: {len(chromosome)}')
             self._population.append(np.array(chromosome))
-
-        # sigma = (max_range - min_range) * 0.1
-        # print(
-        #     f'dimension: {self._dimension}, base fields number: {self._base_fields_number}, tau: {self._tau}, sigma: {sigma}')
 
     def mutation(self):
         self._mutated_population = []
@@ -182,15 +212,15 @@ class RBFRegression:
     def train(self, max_iter, data):
         self._data = data
 
-        self.initialize_population(self._max_range, self._min_range)
+        self.initialize_population()
         for i in range(max_iter):
             self.mutation()
             self.crossover()
             self.survivors_selection()
             print(f'iter {i}')
-            bst, avg = self.return_best_avg_fit(self._population)
-            self._best_fitness_list.append(bst)
-            self._avg_fitness_list.append(avg)
+            # bst, avg = self.return_best_avg_fit(self._population)
+            # self._best_fitness_list.append(bst)
+            # self._avg_fitness_list.append(avg)
 
         self._best_chromosome = self.select_best(self._population)
         print(f'best : {self._best_chromosome}')
@@ -246,7 +276,6 @@ class RBFBinClassifier:
         self._best_fitness_list = [0]
         self._avg_fitness_list = [0]
         self._range_mat = []
-        self._range_mat = []
         self._most_dist = 0.0
 
     def data(self, d=None):
@@ -276,13 +305,6 @@ class RBFBinClassifier:
         # dataset_length = self._data.shape[0]
         self._dimension = self._data.shape[1]
         self._y_star = dataset_train.iloc[:, dataset_train.shape[1] - 1:dataset_train.shape[1]].values
-        print(f'y star shape: {self._y_star.shape}')
-        self._y_star = self._y_star.reshape(len(self._y_star), 1)
-
-        # tmp_list = []
-        # for i in range(len(self._y_star)):
-        #     tmp_list.append(self._y_star[i][0])
-        # self._y_star = np.array(tmp_list)
         self._y_star = self._y_star[:, 0]
         print(f'y star len: {len(self._y_star)}')
         print(f'y star shape: {self._y_star.shape}')
