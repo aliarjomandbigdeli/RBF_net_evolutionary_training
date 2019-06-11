@@ -494,7 +494,7 @@ class RBFClassifier:
         self._avg_fitness_list = [0]
         self._range_mat = []
         self._most_dist = 0.0
-        self._num_classes = 3
+        self._num_classes = 5
 
     def data(self, d=None):
         """getter and setter of data"""
@@ -528,13 +528,15 @@ class RBFClassifier:
         print(f'y star len: {len(self._y_star)}')
         print(f'y star shape: {self._y_star.shape}')
         print(self._y_star)
-        self.one_hot()
+        # self.one_hot()
 
     def one_hot(self):
+        if np.min(self._y_star) == 1:
+            self._y_star -= 1
+        print(f'y star in one hot : {self._y_star}')
         self._y_star_before_1hot = self._y_star
         self._y_star = np.zeros((len(self._y_star_before_1hot), self._num_classes))
         self._y_star[np.arange(len(self._y_star_before_1hot)), self._y_star_before_1hot] = 1
-        # print(f'y star : {self._y_star}')
 
     def initialize_parameters_based_on_data(self):
         self._base_fields_number = self._dimension + 1

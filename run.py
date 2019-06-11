@@ -9,7 +9,7 @@ import rbf_es
 .. since:: 6/2/2019
 """
 
-colors = {0: 'red', 1: 'blue', 2: 'green'}
+colors = {0: 'red', 1: 'blue', 2: 'green', 3: 'cyan', 4: 'yellow', 5: 'black', 6: 'magenta'}
 
 
 def main():
@@ -122,8 +122,8 @@ def run_classification():
     sample_num = 300
     iter_num = 20
     my_rbf_classifier = rbf_es.RBFClassifier()
-    my_rbf_classifier.create_random_dataset(sample_num, 3, 2)
-    # my_rbf_classifier.read_excel("5clstest5000.xlsx")
+    # my_rbf_classifier.create_random_dataset(sample_num, 3, 2)
+    my_rbf_classifier.read_excel("5clstest5000.xlsx")
     my_rbf_classifier.initialize_parameters_based_on_data()
     my_rbf_classifier.train(iter_num, my_rbf_classifier.data())
 
