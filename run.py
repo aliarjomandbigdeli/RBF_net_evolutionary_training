@@ -70,6 +70,7 @@ def run_bin_classification():
 
         print(my_rbf_bin._y_star)
         print(my_rbf_bin.y())
+        print(np.around(my_rbf_bin.y()))
 
         plt.figure()
         df = DataFrame(dict(x=my_rbf_bin.data()[:, 0], y=my_rbf_bin.data()[:, 1], label=np.around(my_rbf_bin.y())))

@@ -232,9 +232,6 @@ class RBFBinClassifier:
         self._g = []
         self._w = []  # weight matrix
 
-        self._min_range = -10
-        self._max_range = 10
-
         self._population = []
         self._mutated_population = []
         self._population_size = 30
@@ -249,7 +246,7 @@ class RBFBinClassifier:
         self._avg_fitness_list = [0]
         self._range_mat = []
         self._range_mat = []
-        # self._range_mat = np.zeros((len(self._data), len(chromo))
+        self._most_dist = 0.0
 
     def data(self, d=None):
         """getter and setter of data"""
@@ -264,22 +261,12 @@ class RBFBinClassifier:
     def y_star(self):
         return self._y_star
 
-    def create_random_data(self, num_of_data, dimension, cluster_number):
-        x, y = make_blobs(n_samples=num_of_data, centers=cluster_number, n_features=dimension)
-        self._dimension = dimension
-        self._data = x
-        self._y_star = y
-
     def create_random_dataset(self, num_of_data, cluster_number, dimension):
         """create random dataset by normal distribution"""
         x, y = make_blobs(n_samples=num_of_data, centers=cluster_number, n_features=dimension)
-        # x, y = make_blobs(n_samples=100, centers=cluster_number, n_features=dimension)
         self._dimension = dimension
         self._data = x
         self._y_star = y
-
-        self._max_range = max(self._data[:, 0])
-        self._min_range = min(self._data[:, 0])
 
     def initialize_parameters_based_on_data(self):
         self._base_fields_number = self._dimension + 1
@@ -291,24 +278,28 @@ class RBFBinClassifier:
         for i in range(self._dimension):
             self._range_mat[i, 0] = np.max(self._data[:, i])
             self._range_mat[i, 1] = np.min(self._data[:, i])
+        s = 0.0
+        for i in range(self._dimension):
+            s += (self._range_mat[i, 0] - self._range_mat[i, 1]) ** 2
+        self._most_dist = s ** (1 / self._dimension)
 
-        self._max_range = self._range_mat[0, 0]
-        self._min_range = self._range_mat[0, 1]
-
-        self._max_range = max(self._data[:, 0])
-        self._min_range = min(self._data[:, 0])
-
+        # print(f'range mat: {self._range_mat}')
+        # print(f'most distance: {self._most_dist}')
 
     def initialize_population(self, max_range, min_range):
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
-            chromosome = [(max_range - min_range) * 0.1]  # add σ to chromosome
+            # chromosome = [(max_range - min_range) * 0.1]  # add σ to chromosome
+            chromosome = [self._most_dist * 0.1]  # add σ to chromosome
             for j in range(
                     self._base_fields_number * random.randint(self._chromosome_min_bases, self._chromosome_max_bases)):
                 if (j + 1) % self._base_fields_number != 0:
-                    chromosome.append(random.random() * (max_range - min_range) + min_range)
+                    chromosome.append(random.random() * (
+                            self._range_mat[j % self._base_fields_number, 0] - self._range_mat[
+                        j % self._base_fields_number, 1]) + self._range_mat[j % self._base_fields_number, 1])
+                    # chromosome.append(random.random() * (max_range - min_range) + min_range)
                 else:  # radius can't be negative
-                    chromosome.append(random.random() * (max_range - min_range))
+                    chromosome.append(random.random() * self._most_dist)
             # print(f'chromosome {i}: {chromosome}, len: {len(chromosome)}')
             self._population.append(np.array(chromosome))
 
