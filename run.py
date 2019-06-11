@@ -52,11 +52,12 @@ def run_regression():
 
 
 def run_bin_classification():
-    for i in range(1):
-        sample_num = 100
+    for i in range(2):
+        sample_num = 300
         iter_num = 30
         my_rbf_bin = rbf_es.RBFBinClassifier()
-        my_rbf_bin.create_random_dataset(100, 2, 2)
+        my_rbf_bin.create_random_dataset(sample_num, 2, 2)
+        # my_rbf_bin.read_excel("train.xlsx")
         my_rbf_bin.initialize_parameters_based_on_data()
         my_rbf_bin.train(iter_num, my_rbf_bin.data())
 
@@ -68,7 +69,10 @@ def run_bin_classification():
         plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
         plt.savefig(f'{i}-1.png')
 
+        print(my_rbf_bin.data()[:, 0])
+        print(my_rbf_bin.data()[:, 1])
         print(my_rbf_bin._y_star)
+        print(f'shape: {my_rbf_bin._y_star.shape}')
         print(my_rbf_bin.y())
         print(np.around(my_rbf_bin.y()))
 

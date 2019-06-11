@@ -1,6 +1,7 @@
 from sklearn.datasets.samples_generator import make_blobs, make_regression
 from numpy import linalg as la
 import numpy as np
+import pandas as pd
 import random
 import math
 
@@ -236,7 +237,7 @@ class RBFBinClassifier:
         self._mutated_population = []
         self._population_size = 30
         self._child2population_ratio = 7
-        self._chromosome_max_bases = 7  # in this version length of chromosomes aren't constant
+        self._chromosome_max_bases = 4  # in this version length of chromosomes aren't constant
         self._chromosome_min_bases = 2
         self._base_fields_number = 2  # x,r (dimension + 1(for radius))
         self._tau = 1 / (self._base_fields_number ** 0.5)
@@ -268,6 +269,25 @@ class RBFBinClassifier:
         self._data = x
         self._y_star = y
 
+    def read_excel(self, train_address):
+        dataset_train = pd.read_excel(train_address)
+        self._data = dataset_train.iloc[:, 0:dataset_train.shape[1] - 1].values
+        print(self._data)
+        # dataset_length = self._data.shape[0]
+        self._dimension = self._data.shape[1]
+        self._y_star = dataset_train.iloc[:, dataset_train.shape[1] - 1:dataset_train.shape[1]].values
+        print(f'y star shape: {self._y_star.shape}')
+        self._y_star = self._y_star.reshape(len(self._y_star), 1)
+
+        # tmp_list = []
+        # for i in range(len(self._y_star)):
+        #     tmp_list.append(self._y_star[i][0])
+        # self._y_star = np.array(tmp_list)
+        self._y_star = self._y_star[:, 0]
+        print(f'y star len: {len(self._y_star)}')
+        print(f'y star shape: {self._y_star.shape}')
+        print(self._y_star)
+
     def initialize_parameters_based_on_data(self):
         self._base_fields_number = self._dimension + 1
 
@@ -286,7 +306,7 @@ class RBFBinClassifier:
         # print(f'range mat: {self._range_mat}')
         # print(f'most distance: {self._most_dist}')
 
-    def initialize_population(self, max_range, min_range):
+    def initialize_population(self):
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
             # chromosome = [(max_range - min_range) * 0.1]  # add σ to chromosome
@@ -388,7 +408,7 @@ class RBFBinClassifier:
     def train(self, max_iter, data):
         self._data = data
 
-        self.initialize_population(self._max_range, self._min_range)
+        self.initialize_population()
         for i in range(max_iter):
             self.mutation()
             self.crossover()
