@@ -14,9 +14,12 @@ import math
 class RBFRegression:
     def __init__(self):
         self._data = []
+        self._data_test = []
         self._dimension = 2  # number of features
         self._y_star = []
+        self._y_star_test = []
         self._y = []
+        self._y_test = []
         self._g = []
         self._w = []  # weight matrix
 
@@ -73,6 +76,14 @@ class RBFRegression:
         print(f'y star len: {len(self._y_star)}')
         print(f'y star shape: {self._y_star.shape}')
         print(self._y_star)
+
+        # self._data_test = self._data
+        # self._y_star_test = self._y_star
+        #
+        # random_indexes = np.ra
+        #
+        # for i in range(int(0.6 * len(self._data_test))):
+        #     index =
 
     def initialize_parameters_based_on_data(self):
         self._base_fields_number = self._dimension + 1
@@ -243,9 +254,12 @@ class RBFRegression:
 class RBFBinClassifier:
     def __init__(self):
         self._data = []
+        self._data_test = []
         self._dimension = 2  # number of features
         self._y_star = []
+        self._y_star_test = []
         self._y = []
+        self._y_test = []
         self._g = []
         self._w = []  # weight matrix
 
@@ -284,7 +298,7 @@ class RBFBinClassifier:
         self._data = x
         self._y_star = y
 
-    def read_excel(self, train_address):
+    def read_excel(self, train_address, test_address=None):
         dataset_train = pd.read_excel(train_address)
         self._data = dataset_train.iloc[:, 0:dataset_train.shape[1] - 1].values
         print(self._data)
@@ -295,6 +309,15 @@ class RBFBinClassifier:
         print(f'y star len: {len(self._y_star)}')
         print(f'y star shape: {self._y_star.shape}')
         print(self._y_star)
+
+        if test_address is not None:
+            dataset_test = pd.read_excel(train_address)
+            self._data_test = dataset_test.iloc[:, 0:dataset_test.shape[1] - 1].values
+            self._y_star_test = dataset_test.iloc[:, dataset_test.shape[1] - 1:dataset_test.shape[1]].values
+            self._y_star_test = self._y_star_test[:, 0]
+
+            if np.min(self._y_star_test) == -1:
+                self._y_star_test = 0.5 * self._y_star_test + 0.5
 
     def initialize_parameters_based_on_data(self):
         self._base_fields_number = self._dimension + 1
@@ -433,7 +456,7 @@ class RBFBinClassifier:
 
     def fitness(self, chromosome):
         self.calculate_matrices(chromosome)
-        return 1 - np.sum(np.abs(0.5 * np.sign(self._y) + 0.5 - self._y)) / len(self._data)
+        return 1 - np.sum(np.abs(0.5 * np.sign(self._y) + 0.5 - self._y_star)) / len(self._data)
         # return 1 - np.sum(np.abs(np.sign(self._y) - self._y)) / len(self._data)
 
     def calculate_matrices(self, chromosome):
@@ -445,7 +468,6 @@ class RBFBinClassifier:
         for i in range(len(chromosome)):
             if i % self._base_fields_number == 1:
                 center = chromosome[i: i + self._dimension]
-                center
                 radius_vectors.append(chromosome[i + self._base_fields_number - 1])
                 centers.append(center)
 
@@ -458,14 +480,46 @@ class RBFBinClassifier:
         self._w = la.inv(g.transpose().dot(g) + lam * np.identity(len(centers))).dot(g.transpose()).dot(self._y_star)
         self._y = g.dot(self._w)
 
+    def test(self):
+        chromosome = self._best_chromosome
+        g = np.zeros((len(self._data_test), len(chromosome) // self._base_fields_number))
+
+        # print(f'fitness chromosome: {chromosome}, len: {len(chromosome)}')
+        centers = []
+        radius_vectors = []
+        for i in range(len(chromosome)):
+            if i % self._base_fields_number == 1:
+                center = chromosome[i: i + self._dimension]
+                radius_vectors.append(chromosome[i + self._base_fields_number - 1])
+                centers.append(center)
+
+        for i in range(len(self._data_test)):
+            for j in range(len(centers)):
+                g[i, j] = math.exp(-1 * (la.norm(self._data_test[i] - centers[j], 2) / radius_vectors[j]) ** 2)
+
+        # lam = 0.001
+        # w = la.inv(g.transpose().dot(g) + lam * np.identity(len(centers))).dot(g.transpose()).dot(self._y_star_test)
+        self._y_test = g.dot(self._w)
+        print(f'data test shape {self._data_test.shape}')
+        print(f'y star test shape {self._y_star_test.shape}')
+        print(f'y test shape {len(self._y_test.shape)}')
+
+        accuracy = 1 - np.sum(np.abs(0.5 * np.sign(np.around(self._y_test)) + 0.5 - self._y_star_test)) / len(
+            self._data_test)
+        print(f'accuracy test: {accuracy}')
+
 
 class RBFClassifier:
     def __init__(self):
         self._data = []
+        self._data_test = []
         self._dimension = 2  # number of features
         self._y_star = []
+        self._y_star_test = []
         self._y_star_before_1hot = []
+        self._y_star_test_before_1hot = []
         self._y = []
+        self._y_test = []
         self._g = []
         self._w = []  # weight matrix
 
@@ -506,7 +560,7 @@ class RBFClassifier:
         self._data = x
         self._y_star = y
 
-    def read_excel(self, train_address):
+    def read_excel(self, train_address, test_address=None):
         dataset_train = pd.read_excel(train_address)
         self._data = dataset_train.iloc[:, 0:dataset_train.shape[1] - 1].values
         print(self._data)
@@ -517,6 +571,20 @@ class RBFClassifier:
         print(f'y star len: {len(self._y_star)}')
         print(f'y star shape: {self._y_star.shape}')
         print(self._y_star)
+
+        if test_address is not None:
+            dataset_test = pd.read_excel(train_address)
+            self._data_test = dataset_test.iloc[:, 0:dataset_test.shape[1] - 1].values
+            self._y_star_test = dataset_test.iloc[:, dataset_test.shape[1] - 1:dataset_test.shape[1]].values
+            self._y_star_test = self._y_star_test[:, 0]
+            self.one_hot_y_star_test()
+
+    def one_hot_y_star_test(self):
+        if np.min(self._y_star_test) == 1:
+            self._y_star_test -= 1
+        self._y_star_test_before_1hot = self._y_star_test
+        self._y_star_test = np.zeros((len(self._y_star_test_before_1hot), self._num_classes))
+        self._y_star_test[np.arange(len(self._y_star_test_before_1hot)), self._y_star_test_before_1hot] = 1
 
     def one_hot(self):
         if np.min(self._y_star) == 1:
@@ -673,7 +741,6 @@ class RBFClassifier:
         for i in range(len(chromosome)):
             if i % self._base_fields_number == 1:
                 center = chromosome[i: i + self._dimension]
-                center
                 radius_vectors.append(chromosome[i + self._base_fields_number - 1])
                 centers.append(center)
 
@@ -685,3 +752,30 @@ class RBFClassifier:
         lam = 0.001
         self._w = la.inv(g.transpose().dot(g) + lam * np.identity(len(centers))).dot(g.transpose()).dot(self._y_star)
         self._y = g.dot(self._w)
+
+    def test(self):
+        chromosome = self._best_chromosome
+        g = np.zeros((len(self._data_test), len(chromosome) // self._base_fields_number))
+        # print(f'fitness chromosome: {chromosome}, len: {len(chromosome)}')
+        centers = []
+        radius_vectors = []
+        for i in range(len(chromosome)):
+            if i % self._base_fields_number == 1:
+                center = chromosome[i: i + self._dimension]
+                radius_vectors.append(chromosome[i + self._base_fields_number - 1])
+                centers.append(center)
+
+        for i in range(len(self._data_test)):
+            for j in range(len(centers)):
+                g[i, j] = math.exp(-1 * (la.norm(self._data_test[i] - centers[j], 2) / radius_vectors[j]) ** 2)
+
+        self._g = g
+        lam = 0.001
+        self._w = la.inv(g.transpose().dot(g) + lam * np.identity(len(centers))).dot(g.transpose()).dot(self._y_star_test)
+        self._y_test = g.dot(self._w)
+
+        accuracy = 1 - np.sum(
+            np.sign(np.abs(np.argmax(self._y_test, axis=1) - np.argmax(self._y_star_test, axis=1)))) / len(
+            self._data_test)
+        print(f'accuracy test: {accuracy}')
+        self._y_test = np.argmax(self._y_test, axis=1)

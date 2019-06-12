@@ -16,8 +16,8 @@ def main():
     print('RBF Network')
 
     # run_regression()
-    run_bin_classification()
-    # run_classification()
+    # run_bin_classification()
+    run_classification()
 
 
 def run_regression():
@@ -74,13 +74,14 @@ def run_regression():
 def run_bin_classification():
     for i in range(1):
         sample_num = 5000
-        iter_num = 5
+        iter_num = 2
         my_rbf_bin = rbf_es.RBFBinClassifier()
         my_rbf_bin.create_random_dataset(sample_num, 2, 2)
         # my_rbf_bin.read_excel("train.xlsx")
-        my_rbf_bin.read_excel("2clstrain5000.xlsx")
+        my_rbf_bin.read_excel("2clstest5000.xlsx","2clstest1500.xlsx")
         my_rbf_bin.initialize_parameters_based_on_data()
         my_rbf_bin.train(iter_num, my_rbf_bin.data())
+        my_rbf_bin.test()
 
         df = DataFrame(dict(x=my_rbf_bin.data()[:, 0], y=my_rbf_bin.data()[:, 1], label=my_rbf_bin._y_star))
         fig, ax = plt.subplots()
@@ -96,7 +97,7 @@ def run_bin_classification():
         # print(f'shape: {my_rbf_bin._y_star.shape}')
         # print(my_rbf_bin.y())
         # print(np.around(my_rbf_bin.y()))
-        accuracy = 1 - np.sum(np.abs(0.5 * np.around(my_rbf_bin.y()) + 0.5 - np.around(my_rbf_bin.y()))) / len(
+        accuracy = 1 - np.sum(np.abs(0.5 * np.around(my_rbf_bin.y()) + 0.5 - np.around(my_rbf_bin._y_star))) / len(
             np.around(my_rbf_bin.y()))
         print(f'accuracy: {accuracy}')
         plt.figure()
@@ -111,21 +112,45 @@ def run_bin_classification():
         plt.savefig(f'{i}-2.png')
 
         plt.figure()
+        df = DataFrame(
+            dict(x=my_rbf_bin._data_test[:, 0], y=my_rbf_bin._data_test[:, 1], label=my_rbf_bin._y_star_test))
+        fig, ax = plt.subplots()
+        grouped = df.groupby('label')
+        for key, group in grouped:
+            group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
+        # plt.show()
+        plt.legend()
+        plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, test data, figure index: {i}')
+        plt.savefig(f'{i}-3.png')
+
+        plt.figure()
+        df = DataFrame(dict(x=my_rbf_bin._data_test[:, 0], y=my_rbf_bin._data_test[:, 1], label=np.around(my_rbf_bin._y_test)))
+        fig, ax = plt.subplots()
+        grouped = df.groupby('label')
+        for key, group in grouped:
+            group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
+        # plt.show()
+        plt.legend()
+        plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, test predict, figure index: {i}')
+        plt.savefig(f'{i}-4.png')
+
+        plt.figure()
         plt.plot(my_rbf_bin._best_fitness_list, '-o', label='best')
         plt.plot(my_rbf_bin._avg_fitness_list, '-o', label='average')
         plt.legend()
         plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
-        plt.savefig(f'{i}-3.png')
+        plt.savefig(f'{i}-5.png')
 
 
 def run_classification():
-    sample_num = 300
-    iter_num = 20
+    sample_num = 5000
+    iter_num = 2
     my_rbf_classifier = rbf_es.RBFClassifier()
     # my_rbf_classifier.create_random_dataset(sample_num, 3, 2)
-    my_rbf_classifier.read_excel("5clstest5000.xlsx")
+    my_rbf_classifier.read_excel("5clstest5000.xlsx", "5clstest1500.xlsx")
     my_rbf_classifier.initialize_parameters_based_on_data()
     my_rbf_classifier.train(iter_num, my_rbf_classifier.data())
+    my_rbf_classifier.test()
 
     df = DataFrame(dict(x=my_rbf_classifier.data()[:, 0], y=my_rbf_classifier.data()[:, 1],
                         label=my_rbf_classifier._y_star_before_1hot))
@@ -156,12 +181,36 @@ def run_classification():
     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
     plt.savefig(f'2.png')
 
+    # plt.figure()
+    # plt.plot(my_rbf_classifier._best_fitness_list, '-o', label='best')
+    # plt.plot(my_rbf_classifier._avg_fitness_list, '-o', label='average')
+    # plt.legend()
+    # plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
+    # plt.savefig(f'3.png')
+
     plt.figure()
-    plt.plot(my_rbf_classifier._best_fitness_list, '-o', label='best')
-    plt.plot(my_rbf_classifier._avg_fitness_list, '-o', label='average')
+    df = DataFrame(
+        dict(x=my_rbf_classifier._data_test[:, 0], y=my_rbf_classifier._data_test[:, 1], label=my_rbf_classifier._y_star_test))
+    fig, ax = plt.subplots()
+    grouped = df.groupby('label')
+    for key, group in grouped:
+        group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
+    # plt.show()
     plt.legend()
-    plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
+    plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, test data')
     plt.savefig(f'3.png')
+
+    plt.figure()
+    df = DataFrame(
+        dict(x=my_rbf_classifier._data_test[:, 0], y=my_rbf_classifier._data_test[:, 1], label=np.around(my_rbf_classifier._y_test)))
+    fig, ax = plt.subplots()
+    grouped = df.groupby('label')
+    for key, group in grouped:
+        group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
+    # plt.show()
+    plt.legend()
+    plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, test predict')
+    plt.savefig(f'4.png')
 
 
 if __name__ == '__main__':
