@@ -90,13 +90,15 @@ def run_bin_classification():
         plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
         plt.savefig(f'{i}-1.png')
 
-        print(my_rbf_bin.data()[:, 0])
-        print(my_rbf_bin.data()[:, 1])
-        print(my_rbf_bin._y_star)
-        print(f'shape: {my_rbf_bin._y_star.shape}')
-        print(my_rbf_bin.y())
-        print(np.around(my_rbf_bin.y()))
-
+        # print(my_rbf_bin.data()[:, 0])
+        # print(my_rbf_bin.data()[:, 1])
+        # print(my_rbf_bin._y_star)
+        # print(f'shape: {my_rbf_bin._y_star.shape}')
+        # print(my_rbf_bin.y())
+        # print(np.around(my_rbf_bin.y()))
+        accuracy = 1 - np.sum(np.abs(0.5 * np.around(my_rbf_bin.y()) + 0.5 - np.around(my_rbf_bin.y()))) / len(
+            np.around(my_rbf_bin.y()))
+        print(f'accuracy: {accuracy}')
         plt.figure()
         df = DataFrame(dict(x=my_rbf_bin.data()[:, 0], y=my_rbf_bin.data()[:, 1], label=np.around(my_rbf_bin.y())))
         fig, ax = plt.subplots()

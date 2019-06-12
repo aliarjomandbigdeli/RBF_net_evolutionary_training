@@ -253,8 +253,8 @@ class RBFBinClassifier:
         self._mutated_population = []
         self._population_size = 30
         self._child2population_ratio = 7
-        self._chromosome_max_bases = 8  # in this version length of chromosomes aren't constant
-        self._chromosome_min_bases = 4
+        self._chromosome_max_bases = 10  # in this version length of chromosomes aren't constant
+        self._chromosome_min_bases = 5
         self._base_fields_number = 2  # x,r (dimension + 1(for radius))
         self._tau = 1 / (self._base_fields_number ** 0.5)
         self._children = []
