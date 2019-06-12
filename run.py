@@ -9,15 +9,15 @@ import rbf_es
 .. since:: 6/2/2019
 """
 
-colors = {0: 'red', 1: 'blue', 2: 'green', 3: 'cyan', 4: 'yellow', 5: 'black', 6: 'magenta'}
+colors = {-2: 'black', - 1: 'red', 0: 'red', 1: 'blue', 2: 'green', 3: 'cyan', 4: 'yellow', 5: 'black', 6: 'magenta'}
 
 
 def main():
     print('RBF Network')
 
     # run_regression()
-    # run_bin_classification()
-    run_classification()
+    run_bin_classification()
+    # run_classification()
 
 
 def run_regression():
@@ -37,11 +37,8 @@ def run_regression():
     #     # -- unsorted
     #
     #     # -- sorted samples(usually is in regression)
-    #     plt.plot(my_rbf_reg.y(), '-o', label='RBF-Net')
-    #     plt.plot(my_rbf_reg.y_star(), '-o', label='true')
-    #
-    #     # plt.plot(my_rbf_reg.data(), my_rbf_reg.y(), '-o', label='RBF-Net')
-    #     # plt.plot(my_rbf_reg.data(), my_rbf_reg.y_star(), '-o', label='true')
+    #     plt.plot(my_rbf_reg.data(), my_rbf_reg.y(), '-o', label='RBF-Net')
+    #     plt.plot(my_rbf_reg.data(), my_rbf_reg.y_star(), '-o', label='true')
     #     # -- sorted
     #     plt.legend()
     #     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
@@ -56,7 +53,7 @@ def run_regression():
     #     plt.savefig(f'{i}-2.png')
 
     # read excel
-    iter_num = 15
+    iter_num = 10
     my_rbf_reg = rbf_es.RBFRegression()
     my_rbf_reg.read_excel("regdata2000.xlsx")
     my_rbf_reg.initialize_parameters_based_on_data()
@@ -75,12 +72,13 @@ def run_regression():
 
 
 def run_bin_classification():
-    for i in range(2):
-        sample_num = 300
-        iter_num = 30
+    for i in range(1):
+        sample_num = 5000
+        iter_num = 5
         my_rbf_bin = rbf_es.RBFBinClassifier()
         my_rbf_bin.create_random_dataset(sample_num, 2, 2)
         # my_rbf_bin.read_excel("train.xlsx")
+        my_rbf_bin.read_excel("2clstrain5000.xlsx")
         my_rbf_bin.initialize_parameters_based_on_data()
         my_rbf_bin.train(iter_num, my_rbf_bin.data())
 
