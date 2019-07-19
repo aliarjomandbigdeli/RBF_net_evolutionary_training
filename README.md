@@ -2,14 +2,19 @@
 In this project, I implemented and train a network to do regression, binary classification and multi class classification.
 I used evolutionary strategy for training.
 
-List of content:
-- [Evolutionary Strategy Parameters](#Evolutionary-Strategy-Parameters).
+In this implementation, the length of chromosome is not fixed, and the algorithm finds the optimum one(find the optimum number of bases).
+
+List of contents:
+- [Evolutionary Strategy (ES) Parameters](#Evolutionary-Strategy-Parameters).
 - [Network Architecture](#Network-Architecture).
 - [How to use](#How-to-use).
 
 ## Evolutionary Strategy Parameters
 ### Representation
+If your data is two dimensional:
+```
 <σ,x1,y1,r1,x2,y2,r2,...>
+```
 
 ### Initial Population
 I selected them randomly and uniformly.
