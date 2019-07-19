@@ -53,7 +53,7 @@ def run_regression():
     #     plt.savefig(f'{i}-2.png')
 
     # read excel
-    iter_num = 5
+    iter_num = 6
     my_rbf_reg = rbf_es.RBFRegression()
     # my_rbf_reg.read_excel("regdata2000.xlsx")
     my_rbf_reg.read_excel("regdata2000.xlsx")
@@ -227,19 +227,19 @@ def run_classification():
     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, test predict')
     plt.savefig(f'4.png')
 
-    plt.figure()
-    df = DataFrame(
-        dict(x=my_rbf_classifier._data_test[:, 0], y=my_rbf_classifier._data_test[:, 1],
-             label=(my_rbf_classifier._y_test - my_rbf_classifier.y())))
-    # label=(np.around(my_rbf_classifier._y_test) - np.around(my_rbf_classifier.y()))))
-    fig, ax = plt.subplots()
-    grouped = df.groupby('label')
-    for key, group in grouped:
-        group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
-    # plt.show()
-    plt.legend()
-    plt.title(f'number of iterations:  {iter_num}, test predict(label=0:correct)')
-    plt.savefig(f'5.png')
+    # plt.figure()
+    # df = DataFrame(
+    #     dict(x=my_rbf_classifier._data_test[:, 0], y=my_rbf_classifier._data_test[:, 1],
+    #          label=(my_rbf_classifier._y_test - my_rbf_classifier.y())))
+    # # label=(np.around(my_rbf_classifier._y_test) - np.around(my_rbf_classifier.y()))))
+    # fig, ax = plt.subplots()
+    # grouped = df.groupby('label')
+    # for key, group in grouped:
+    #     group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
+    # # plt.show()
+    # plt.legend()
+    # plt.title(f'number of iterations:  {iter_num}, test predict(label=0:correct)')
+    # plt.savefig(f'5.png')
 
 
 if __name__ == '__main__':

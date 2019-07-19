@@ -1,7 +1,6 @@
 from sklearn.datasets.samples_generator import make_blobs, make_regression
 from numpy import linalg as la
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 import random
 import math
@@ -30,10 +29,11 @@ class RBFRegression:
         self._population = []
         self._mutated_population = []
         self._population_size = 30
-        self._child2population_ratio = 4
+        self._child2population_ratio = 7
         self._chromosome_max_bases = 8  # in this version length of chromosomes aren't constant
         self._chromosome_min_bases = 4
         self._base_fields_number = 4  # x,r (dimension + 1(for radius))
+        # self._tau = 1 / (self._base_fields_number ** 0.5)
         self._tau = 0.5 / ((self._base_fields_number * self._chromosome_max_bases) ** 0.5)
         self._children = []
         self._best_chromosome = []
@@ -54,6 +54,13 @@ class RBFRegression:
 
     def y_star(self):
         return self._y_star
+
+    def y_test(self):
+        """:returns predicted vector"""
+        return self._y_test
+
+    def y_star_test(self):
+        return self._y_star_test
 
     def create_random_dataset(self, num_of_data, dimension):
         x = np.random.uniform(0., 2., num_of_data)
@@ -116,6 +123,7 @@ class RBFRegression:
         # print(f'most distance: {self._most_dist}')
 
     def initialize_population(self):
+        m = len(self._data * self._dimension) ** (1 / self._dimension)
         # chromosome representation : <σ,x1,y1,r1,x2,y2,r2,...>
         for i in range(self._population_size):
             chromosome = [np.random.uniform(self._most_dist * 0.01, self._most_dist * 0.1)]  # add σ to chromosome
@@ -127,6 +135,7 @@ class RBFRegression:
                         j % self._base_fields_number, 1]) + self._range_mat[j % self._base_fields_number, 1])
                     # chromosome.append(random.random() * (max_range - min_range) + min_range)
                 else:  # radius can't be negative
+                    # chromosome.append(random.uniform(0.75 * m, m))
                     chromosome.append(random.random() * self._most_dist)
             # print(f'chromosome {i}: {chromosome}, len: {len(chromosome)}')
             self._population.append(np.array(chromosome))
@@ -527,8 +536,6 @@ class RBFBinClassifier:
             for j in range(len(centers)):
                 g[i, j] = math.exp(-1 * (la.norm(self._data_test[i] - centers[j], 2) / radius_vectors[j]) ** 2)
 
-        # lam = 0.001
-        # w = la.inv(g.transpose().dot(g) + lam * np.identity(len(centers))).dot(g.transpose()).dot(self._y_star_test)
         self._y_test = g.dot(self._w)
         print(f'data test shape {self._data_test.shape}')
         print(f'y star test shape {self._y_star_test.shape}')
@@ -818,10 +825,3 @@ class RBFClassifier:
             self._data_test)
         print(f'accuracy test: {accuracy}')
         self._y_test = np.argmax(self._y_test, axis=1)
-
-        # # plot circle:
-        # ax = plt.gca()
-        # cc = plt.Circle(centers, radius_vectors, facecolor='none', edgecolor='black')
-        # ax.add_patch(cc)
-        # plt.axis('scaled')
-        # plt.show()
