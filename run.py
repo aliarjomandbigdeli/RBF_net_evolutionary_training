@@ -121,8 +121,7 @@ def run_regression():
     # read excel
     iter_num = 6
     my_rbf_reg = rbf_es.RBFRegression()
-    # my_rbf_reg.read_excel("regdata2000.xlsx")
-    my_rbf_reg.read_excel("regdata2000.xlsx")
+    my_rbf_reg.read_excel("dataset/regdata2000.xlsx")
     my_rbf_reg.initialize_parameters_based_on_data()
     my_rbf_reg.train(iter_num, my_rbf_reg.data())
     my_rbf_reg.test()

@@ -70,6 +70,15 @@ You feed xlsx data by `read_excel` method.
 ## Some Results
 The result of the dataset in `dataset` folder, is shown below:
 
+- Regression:
+
+![picture](images/reg-res.png) 
+```
+error: 7%
+```
+
+- Classification:
+
 ![picture](images/mul-cls-res(1).png) 
 
 ![picture](images/mul-cls-res(2).png) 
@@ -77,3 +86,7 @@ The result of the dataset in `dataset` folder, is shown below:
 ![picture](images/mul-cls-res(3).png) 
 
 ![picture](images/mul-cls-res(4).png) 
+
+```
+precision: 95%
+```
