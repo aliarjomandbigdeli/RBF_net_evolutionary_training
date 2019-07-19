@@ -8,6 +8,7 @@ List of contents:
 - [Evolutionary Strategy (ES) Parameters](#Evolutionary-Strategy-Parameters).
 - [Network Architecture](#Network-Architecture).
 - [How to use](#How-to-use).
+- [Some Results](#Some-Results).
 
 ## Evolutionary Strategy Parameters
 ### Representation
@@ -65,5 +66,14 @@ You can see the network architecture for multi class classifier below:
 ## How to use
 ### Feed Data
 You feed xlsx data by `read_excel` method.
- 
-  
+
+## Some Results
+The result of the dataset in `dataset` folder, is shown below:
+
+![picture](images/mul-cls-res(1).png) 
+
+![picture](images/mul-cls-res(2).png) 
+
+![picture](images/mul-cls-res(3).png) 
+
+![picture](images/mul-cls-res(4).png) 

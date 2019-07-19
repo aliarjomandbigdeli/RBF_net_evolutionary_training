@@ -348,7 +348,7 @@ class RBFBinClassifier:
         print(self._y_star)
 
         if test_address is not None:
-            dataset_test = pd.read_excel(train_address)
+            dataset_test = pd.read_excel(test_address)
             self._data_test = dataset_test.iloc[:, 0:dataset_test.shape[1] - 1].values
             self._y_star_test = dataset_test.iloc[:, dataset_test.shape[1] - 1:dataset_test.shape[1]].values
             self._y_star_test = self._y_star_test[:, 0]
@@ -610,7 +610,7 @@ class RBFClassifier:
         print(self._y_star)
 
         if test_address is not None:
-            dataset_test = pd.read_excel(train_address)
+            dataset_test = pd.read_excel(test_address)
             self._data_test = dataset_test.iloc[:, 0:dataset_test.shape[1] - 1].values
             self._y_star_test = dataset_test.iloc[:, dataset_test.shape[1] - 1:dataset_test.shape[1]].values
             self._y_star_test = self._y_star_test[:, 0]
@@ -620,21 +620,20 @@ class RBFClassifier:
         if np.min(self._y_star_test) == 1:
             self._y_star_test -= 1
         if np.min(self._y_star_test) == -1:
-            self._y_star_test = 0.5 * self._y_star_test + 0.5
+            self._y_star_test = (0.5 * self._y_star_test + 0.5) // 1
 
+        print(f'y star test before 1 hot : {self._y_star_test}, size: {len(self._y_star_test)}')
         self._y_star_test_before_1hot = self._y_star_test
-        # self._y_star_test_before_1hot = np.around(self._y_star_test_before_1hot)
-
         self._y_star_test = np.zeros((len(self._y_star_test_before_1hot), self._num_classes))
         self._y_star_test[np.arange(len(self._y_star_test_before_1hot)), self._y_star_test_before_1hot] = 1
 
     def one_hot(self):
         if np.min(self._y_star) == 1:
             self._y_star -= 1
-        if np.min(self._y_star) == 1:
-            self._y_star = 0.5 * self._y_star + 0.5
+        if np.min(self._y_star) == -1:
+            self._y_star = (0.5 * self._y_star + 0.5) // 1
 
-        print(f'y star in one hot : {self._y_star}')
+        print(f'y star in one hot : {self._y_star}, size: {len(self._y_star)}')
         self._y_star_before_1hot = self._y_star
         self._y_star = np.zeros((len(self._y_star_before_1hot), self._num_classes))
         self._y_star[np.arange(len(self._y_star_before_1hot)), self._y_star_before_1hot] = 1
