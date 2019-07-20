@@ -353,13 +353,9 @@ class RBFBinClassifier:
             self._y_star_test = dataset_test.iloc[:, dataset_test.shape[1] - 1:dataset_test.shape[1]].values
             self._y_star_test = self._y_star_test[:, 0]
 
-            if np.min(self._y_star_test) == -1:
-                self._y_star_test = 0.5 * self._y_star_test + 0.5
-
     def initialize_parameters_based_on_data(self):
         self._base_fields_number = self._dimension + 1
 
-        # self._tau = 0.5 / ((self._base_fields_number * self._chromosome_max_bases) ** 0.5)
         self._tau = 1 / (self._base_fields_number ** 0.5)
 
         self._range_mat = np.zeros((self._dimension, 2))
@@ -372,9 +368,6 @@ class RBFBinClassifier:
         # self._most_dist = s ** (1 / self._dimension)
 
         self._most_dist = np.max(self._data) - np.min(self._data)
-
-        if np.min(self._y_star) == -1:
-            self._y_star = 0.5 * self._y_star + 0.5
 
         print(f'y_star new: {self._y_star}')
         # print(f'range mat: {self._range_mat}')
@@ -495,8 +488,7 @@ class RBFBinClassifier:
 
     def fitness(self, chromosome):
         self.calculate_matrices(chromosome)
-        return 1 - np.sum(np.abs(0.5 * np.sign(self._y) + 0.5 - self._y_star)) / len(self._data)
-        # return 1 - np.sum(np.abs(np.sign(self._y) - self._y)) / len(self._data)
+        return 1 - np.sum(np.abs(np.sign(self._y) - self._y_star)) / (2 * len(self._data))
 
     def calculate_matrices(self, chromosome):
         g = np.zeros((len(self._data), len(chromosome) // self._base_fields_number))
@@ -541,8 +533,7 @@ class RBFBinClassifier:
         print(f'y star test shape {self._y_star_test.shape}')
         print(f'y test shape {len(self._y_test.shape)}')
 
-        accuracy = 1 - np.sum(np.abs(0.5 * np.sign(np.around(self._y_test)) + 0.5 - self._y_star_test)) / len(
-            self._data_test)
+        accuracy = 1 - np.sum(np.abs(np.sign(self._y_test) - self._y_star_test)) / (2 * len(self._data_test))
         print(f'accuracy test: {accuracy}')
 
 
@@ -619,8 +610,6 @@ class RBFClassifier:
     def one_hot_y_star_test(self):
         if np.min(self._y_star_test) == 1:
             self._y_star_test -= 1
-        if np.min(self._y_star_test) == -1:
-            self._y_star_test = (0.5 * self._y_star_test + 0.5) // 1
 
         print(f'y star test before 1 hot : {self._y_star_test}, size: {len(self._y_star_test)}')
         self._y_star_test_before_1hot = self._y_star_test
@@ -630,8 +619,6 @@ class RBFClassifier:
     def one_hot(self):
         if np.min(self._y_star) == 1:
             self._y_star -= 1
-        if np.min(self._y_star) == -1:
-            self._y_star = (0.5 * self._y_star + 0.5) // 1
 
         print(f'y star in one hot : {self._y_star}, size: {len(self._y_star)}')
         self._y_star_before_1hot = self._y_star
