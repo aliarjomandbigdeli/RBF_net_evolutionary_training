@@ -15,9 +15,9 @@ colors = {-2: 'black', - 1: 'orange', 0: 'red', 1: 'blue', 2: 'green', 3: 'cyan'
 def main():
     print('RBF Network')
 
-    # run_regression()
+    run_regression()
     run_bin_classification()
-    # run_classification()
+    run_classification()
 
 
 def run_classification():
@@ -53,13 +53,6 @@ def run_classification():
     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, trained result')
     plt.savefig(f'2.png')
 
-    # plt.figure()
-    # plt.plot(my_rbf_classifier._best_fitness_list, '-o', label='best')
-    # plt.plot(my_rbf_classifier._avg_fitness_list, '-o', label='average')
-    # plt.legend()
-    # plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
-    # plt.savefig(f'3.png')
-
     plt.figure()
     df = DataFrame(
         dict(x=my_rbf_classifier._data_test[:, 0], y=my_rbf_classifier._data_test[:, 1],
@@ -88,37 +81,6 @@ def run_classification():
 
 
 def run_regression():
-    # random data:
-    # for i in range(4):
-    #     sample_num = 100
-    #     iter_num = 20
-    #     my_rbf_reg = rbf_es.RBFRegression()
-    #     my_rbf_reg.create_random_dataset(sample_num, 1)
-    #     my_rbf_reg.initialize_parameters_based_on_data()
-    #     my_rbf_reg.train(iter_num, my_rbf_reg.data())
-    #
-    #     plt.figure()
-    #     # -- unsorted
-    #     # plt.scatter(my_rbf_reg.data(), my_rbf_reg.y(), label='RBF-Net')
-    #     # plt.scatter(my_rbf_reg.data(), my_rbf_reg.y_star(), '-o', label='true')
-    #     # -- unsorted
-    #
-    #     # -- sorted samples(usually is in regression)
-    #     plt.plot(my_rbf_reg.data(), my_rbf_reg.y(), '-o', label='RBF-Net')
-    #     plt.plot(my_rbf_reg.data(), my_rbf_reg.y_star(), '-o', label='true')
-    #     # -- sorted
-    #     plt.legend()
-    #     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
-    #     # plt.show()
-    #     plt.savefig(f'{i}-1.png')
-    #
-    #     plt.figure()
-    #     plt.plot(my_rbf_reg._best_fitness_list, '-o', label='best')
-    #     plt.plot(my_rbf_reg._avg_fitness_list, '-o', label='average')
-    #     plt.legend()
-    #     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, figure index: {i}')
-    #     plt.savefig(f'{i}-2.png')
-
     # read excel
     iter_num = 6
     my_rbf_reg = rbf_es.RBFRegression()
@@ -127,16 +89,6 @@ def run_regression():
     my_rbf_reg.train(iter_num, my_rbf_reg.data())
     my_rbf_reg.test()
 
-    # plt.figure()
-    # # -- sorted samples(usually is in regression)
-    # plt.plot(my_rbf_reg.y(), '-o', label='RBF-Net')
-    # plt.plot(my_rbf_reg.y_star(), '-o', label='true')
-    # # -- sorted
-    # plt.legend()
-    # plt.title(f'number of samples: 2000 ,number of iterations:  {iter_num}')
-    # # plt.show()
-    # plt.savefig(f'result1.png')
-
     plt.figure()
     plt.plot(my_rbf_reg._y_test, '-o', label='RBF-Net')
     plt.plot(my_rbf_reg._y_star_test, '-', label='true')
@@ -144,7 +96,7 @@ def run_regression():
     plt.legend()
     plt.title(f'number of samples: 2000 ,number of iterations:  {iter_num}')
     # plt.show()
-    plt.savefig(f'result.png')
+    plt.savefig(f'reg-result.png')
 
 
 def run_bin_classification():
@@ -208,12 +160,12 @@ def run_bin_classification():
         f'number of samples: {test_num} ,number of iterations:  {iter_num}, test predict, test predict')
     plt.savefig(f'bin-4.png')
 
-    plt.figure()
-    plt.plot(my_rbf_bin._best_fitness_list, '-o', label='best')
-    plt.plot(my_rbf_bin._avg_fitness_list, '-o', label='average')
-    plt.legend()
-    plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
-    plt.savefig(f'bin-5.png')
+    # plt.figure()
+    # plt.plot(my_rbf_bin._best_fitness_list, '-o', label='best')
+    # plt.plot(my_rbf_bin._avg_fitness_list, '-o', label='average')
+    # plt.legend()
+    # plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}')
+    # plt.savefig(f'bin-5.png')
 
 
 if __name__ == '__main__':

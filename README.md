@@ -5,10 +5,10 @@ I used evolutionary strategy for training.
 In this implementation, the length of chromosome is not fixed, and the algorithm finds the optimum one(find the optimum number of bases).
 
 List of contents:
-- [Evolutionary Strategy (ES) Parameters](#Evolutionary-Strategy-Parameters).
-- [Network Architecture](#Network-Architecture).
-- [How to use](#How-to-use).
-- [Some Results](#Some-Results).
+- [Evolutionary Strategy (ES) Parameters](#Evolutionary-Strategy-Parameters)
+- [Network Architecture](#Network-Architecture)
+- [How to use](#How-to-use)
+- [Some Results](#Some-Results)
 
 ## Evolutionary Strategy Parameters
 ### Representation
@@ -45,7 +45,7 @@ e = 0.5 . Transpose(y-y*) . (y-y*)    fitness = 1/e
 ```
 - Binary classifier:
 ```
-fitness = 1-sum(abs(sign(y)-y*))/L
+fitness = 1-sum(abs(sign(y)-y*))/2L
 ```
 - Multi classifier:
 ```
@@ -64,6 +64,7 @@ You can see the network architecture for multi class classifier below:
 ![picture](images/arch_multi_class.png)
 
 ## How to use
+You see how I'm used it in `run.py`.
 ### Feed Data
 You feed xlsx data by `read_excel` method.
 
