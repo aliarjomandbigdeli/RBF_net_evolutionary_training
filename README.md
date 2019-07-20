@@ -64,7 +64,7 @@ You can see the network architecture for multi class classifier below:
 ![picture](images/arch_multi_class.png)
 
 ## How to use
-You see how I'm used it in `run.py`.
+You see how I used it in `run.py`.
 ### Feed Data
 You feed xlsx data by `read_excel` method.
 
@@ -90,4 +90,18 @@ error: 7%
 
 ```
 precision: 95%
+```
+
+- Binary Classification:
+
+![picture](images/bin-1.png) 
+
+![picture](images/bin-2.png) 
+
+![picture](images/bin-3.png) 
+
+![picture](images/bin-4.png) 
+
+```
+precision: 98%
 ```
