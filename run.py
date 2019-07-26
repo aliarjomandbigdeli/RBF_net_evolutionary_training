@@ -39,9 +39,6 @@ def run_classification():
     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, training data')
     plt.savefig(f'1.png')
 
-    print(my_rbf_classifier._y_star)
-    print(my_rbf_classifier._y_star_before_1hot)
-
     plt.figure()
     df = DataFrame(dict(x=my_rbf_classifier.data()[:, 0], y=my_rbf_classifier.data()[:, 1],
                         label=my_rbf_classifier.y()))
@@ -117,12 +114,6 @@ def run_bin_classification():
         group.plot(ax=ax, kind='scatter', x='x', y='y', label=key, color=colors[key])
     plt.title(f'number of samples: {sample_num} ,number of iterations:  {iter_num}, training data')
     plt.savefig(f'bin-1.png')
-
-    # print(my_rbf_bin.data()[:, 0])
-    # print(my_rbf_bin.data()[:, 1])
-    # print(my_rbf_bin._y_star)
-    # print(f'shape: {my_rbf_bin._y_star.shape}')
-    # print(my_rbf_bin.y())
 
     plt.figure()
     df = DataFrame(dict(x=my_rbf_bin.data()[:, 0], y=my_rbf_bin.data()[:, 1], label=np.sign(my_rbf_bin.y())))

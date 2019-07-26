@@ -1,5 +1,5 @@
 # RBF Neural Network Evolutionary Training
-In this project, I implemented and train a network to do regression, binary classification and multi class classification.
+In this project, I implemented and trained a network to do regression, binary classification and multi class classification.
 I used evolutionary strategy for training.
 
 In this implementation, the length of chromosome is not fixed, and the algorithm finds the optimum one(find the optimum number of bases).
@@ -18,10 +18,10 @@ If your data is two dimensional:
 ```
 
 ### Initial Population
-I selected them randomly and uniformly.
+I select them randomly and uniformly.
 
 ### Mutation
-I change `τ` by random normal distribution.
+`τ` is changed by random normal distribution.
 
 ```
 σ’ = σ • exp(τ • N(0,1))
@@ -33,10 +33,10 @@ x’i = xi + σ’ • N(0,1)
 ### Crossover
 It just produce one child.
 
-I assigned `Pc=0.4`
+I assign `Pc=0.4`
 
 ### Survivors selection
-I use `μ+λ` and `q-tournament` methods.I take `λ≈7μ` and `q=5`.
+I use `μ+λ` and `q-tournament` methods. I take `λ≈7μ` and `q=5`.
 
 ### Fitness
 - Regression:
@@ -51,7 +51,7 @@ fitness = 1-sum(abs(sign(y)-y*))/2L
 ```
 fitness = 1-sum(sign(abs(indexMax(y)-indexMax(y*)))))/L
 ```
-I used `one-hot encoding` in multi classification.
+I use `one-hot encoding` in multi classification.
 
 ## Network Architecture
 You can see the network architecture for regression below:
@@ -64,9 +64,9 @@ You can see the network architecture for multi class classifier below:
 ![picture](images/arch_multi_class.png)
 
 ## How to use
-You see how I used it in `run.py`.
+You can see how I used it in `run.py`.
 ### Feed Data
-You feed xlsx data by `read_excel` method.
+You can feed xlsx data by `read_excel` method.
 
 ## Some Results
 The result of the dataset in `dataset` folder, is shown below:
